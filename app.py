@@ -1,83 +1,52 @@
-
 import streamlit as st
 import pandas as pd
-import pickle
-import joblib   # <-- WAJIB ditambahkan
+import joblib
 
-# Load the trained model
-model = joblib.load('linear_regression_model.pkl') # Changed model filename and loading method
+# Load trained model (sesuaikan nama file model kamu)
+model = joblib.load('model_joblib.pkl')
 
-# Streamlit app title
-st.title('Prediksi Tagihan Listrik Jakarta')
-st.write('Aplikasi untuk memprediksi jumlah tagihan listrik berdasarkan parameter yang diberikan.')
+st.title('Prediksi Data Kesehatan')
+st.write('Aplikasi ini memprediksi nilai kesehatan berdasarkan parameter pengguna.')
 
-# Sidebar for user inputs
-st.sidebar.header('Input Parameter')
+# Sidebar input
+st.sidebar.header("Input Parameter Kesehatan")
 
 def user_input_features():
-    kwh = st.sidebar.slider('Konsumsi KWH (kWh)', 150.0, 600.0, 350.0)
-    ac_units = st.sidebar.slider('Jumlah AC', 0, 3, 1)
-    ac_hours_per_day = st.sidebar.slider('Jam AC per Hari', 0.0, 10.0, 5.0)
-    family_size = st.sidebar.slider('Jumlah Anggota Keluarga', 2, 6, 4)
-
-    month_name = st.sidebar.selectbox('Bulan', ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
-    tariff_class = st.sidebar.selectbox('Kelas Tarif', ['R1', 'R2', 'R3'])
+    age = st.sidebar.slider('Usia (tahun)', 10, 80, 30)
+    height = st.sidebar.slider('Tinggi Badan (cm)', 120, 200, 165)
+    weight = st.sidebar.slider('Berat Badan (kg)', 30, 120, 60)
+    bmi = st.sidebar.slider('BMI', 10.0, 40.0, 22.5)
+    heart_rate = st.sidebar.slider('Detak Jantung (bpm)', 50, 150, 85)
+    sleep_hours = st.sidebar.slider('Jam Tidur (per Hari)', 1, 12, 7)
 
     data = {
-        'kwh': kwh,
-        'ac_units': ac_units,
-        'ac_hours_per_day': ac_hours_per_day,
-        'family_size': family_size,
-        'month_name': month_name,
-        'tariff_class': tariff_class
+        'Age': age,
+        'Height': height,
+        'Weight': weight,
+        'BMI': bmi,
+        'Heart_Rate': heart_rate,
+        'Sleep_Hours': sleep_hours
     }
-    features = pd.DataFrame(data, index=[0])
-    return features
+
+    return pd.DataFrame(data, index=[0])
 
 df_input = user_input_features()
 
-st.subheader('Parameter Input Pengguna:')
+st.subheader("Parameter Input Pengguna:")
 st.write(df_input)
 
-training_columns_and_dtypes = {
-    'kwh': 'float64',
-    'ac_units': 'int64',
-    'ac_hours_per_day': 'float64',
-    'family_size': 'int64',
-    'month_name_Aug': 'bool', 'month_name_Dec': 'bool', 'month_name_Feb': 'bool',
-    'month_name_Jan': 'bool', 'month_name_Jul': 'bool', 'month_name_Jun': 'bool',
-    'month_name_Mar': 'bool', 'month_name_May': 'bool', 'month_name_Nov': 'bool',
-    'month_name_Oct': 'bool', 'month_name_Sep': 'bool',
-    'tariff_class_R2': 'bool', 'tariff_class_R3': 'bool'
-}
-
-final_input_df = pd.DataFrame(columns=training_columns_and_dtypes.keys())
-for col, dtype in training_columns_and_dtypes.items():
-    final_input_df[col] = final_input_df[col].astype(dtype)
-
-final_input_df.loc[0] = 0
-for col, dtype in training_columns_and_dtypes.items():
-    if dtype == 'bool':
-        final_input_df.loc[0, col] = False
-
-final_input_df.loc[0, 'kwh'] = df_input['kwh'][0]
-final_input_df.loc[0, 'ac_units'] = df_input['ac_units'][0]
-final_input_df.loc[0, 'ac_hours_per_day'] = df_input['ac_hours_per_day'][0]
-final_input_df.loc[0, 'family_size'] = df_input['family_size'][0]
-
-selected_month_col = f"month_name_{df_input['month_name'][0]}"
-if selected_month_col in final_input_df.columns:
-    final_input_df.loc[0, selected_month_col] = True
-
-selected_tariff_col = f"tariff_class_{df_input['tariff_class'][0]}"
-if selected_tariff_col in final_input_df.columns:
-    final_input_df.loc[0, selected_tariff_col] = True
-
-if st.sidebar.button('Prediksi Tagihan'):
+# Prediction Button
+if st.sidebar.button("Prediksi"):
     try:
-        prediction = model.predict(final_input_df)
-        st.subheader('Hasil Prediksi Tagihan Listrik:')
-        st.write(f"Tagihan Diprediksi: Rp {prediction[0]:,.2f}")
+        prediction = model.predict(df_input)
+        st.subheader("Hasil Prediksi:")
+        st.write(f"Nilai Prediksi: {prediction[0]:,.2f}")
     except Exception as e:
-        st.error(f"Terjadi kesalahan saat melakukan prediksi: {e}")
+        st.error(f"Error saat prediksi: {e}")
         st.exception(e)
+"""
+
+with open('app.py', 'w') as f:
+    f.write(app_py_content)
+
+print("app.py created successfully.")
