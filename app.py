@@ -44,8 +44,3 @@ if st.sidebar.button("Prediksi"):
     except Exception as e:
         st.error(f"Error saat prediksi: {e}")
         st.exception(e)
-
-with open('app.py', 'w') as f:
-    f.write(app_py_content)
-
-print("app.py created successfully.")
