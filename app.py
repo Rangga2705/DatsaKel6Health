@@ -3,7 +3,7 @@ import pandas as pd
 import joblib
 
 # Load trained model (sesuaikan nama file model kamu)
-model = joblib.load('model_joblib.pkl')
+model = joblib.load('linear_regression_model.pkl')
 
 st.title('Prediksi Data Kesehatan')
 st.write('Aplikasi ini memprediksi nilai kesehatan berdasarkan parameter pengguna.')
